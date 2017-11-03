@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onSelected(int position, PieChartBean data) {
-                textView.setText("value:"+data.getValue()+"\ntitle:"+data.getTitle()+"\ndescription:"+data.getDescription());
+                textView.setText("value:" + data.getValue() + "\ntitle:" + data.getTitle() + "\ndescription:" + data.getDescription());
             }
         };
 

@@ -42,7 +42,7 @@ public abstract class PieChartAdapter<T> {
             float offsetAngle = 360 - totalAngle;
             tempAngles[mPieChartDatas.size() - 1] += offsetAngle;
         }
-        if (totalAngle > 360) {
+        if (totalAngle > 360) {//超过部分，减在最后一个上
             float offsetAngle = totalAngle - 360;
             tempAngles[mPieChartDatas.size() - 1] -= offsetAngle;
         }
