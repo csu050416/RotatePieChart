@@ -68,7 +68,6 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        super.dispatchTouchEvent(ev);//手动传递
         if(mChartAdapter == null)
             return true;
         if (mVelocityTracker == null) {
@@ -86,8 +85,8 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
                 float moveY = ev.getY();
                 boolean isOutsidePointMove = PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, moveX, moveY) > mRadius;
                 if (!isOutsidePointMove) {
-                    float preAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, preMoveX, preMoveY);//获取点击的角度
-                    float moveAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, moveX, moveY);//获取点击的角度
+                    float preAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, preMoveX, preMoveY);//获取上一个点的角度
+                    float moveAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, moveX, moveY);//获取当前点的角度
                     mChartRenderer.drawTouchRotate(moveAngle - preAngle);
                 }
                 preMoveX = moveX;

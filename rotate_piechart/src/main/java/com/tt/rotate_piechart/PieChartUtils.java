@@ -67,8 +67,7 @@ public class PieChartUtils {
     }
 
     /**
-     * 获取点的角度
-     * 余弦定理是指三角形中任何一边的平方等于其它两边的平方和减去这两边与它们夹角的余弦的积的2倍，即 a2=b2+c2-2bccosA.
+     * 获取点相对中心点的角度
      *
      * @param centerX 基准点x
      * @param centerY 基准的y
@@ -92,10 +91,10 @@ public class PieChartUtils {
     }
 
     /**
-     * 计算圆切线速度
+     * 计算角速度
      *
-     * @param velocityX
-     * @param velocityY
+     * @param velocityX up时x方向的线速度
+     * @param velocityY up时y方向的线速度
      * @param levelAngle 触点到中心点的线与水平线正方向的夹角
      * @param quadrant 象限
      * @param distance 触点到中心店的距离

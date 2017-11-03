@@ -17,7 +17,7 @@ import android.view.animation.LinearInterpolator;
 
 /**
  * 标题: 渲染器
- * 描述：
+ * 描述：饼状图绘制在这个类完成
  * 作者:tengtao
  * 创建时间：2017/11/1 11:50
  */
@@ -287,7 +287,7 @@ public class PieChartRenderer {
                         message.what = TAG_ENTRANCE_DRAW;
                         mCanvasDrawHandler.sendMessage(message);
                     } else {
-                        //将最大值(即第一个数据)中间偏移到底部，在入场动画完成之后
+                        //将第一个数据中间偏移到底部，在入场动画完成之后
                         float afterStartAngle = Math.abs(90 - mCurrentStartAngle) - mChartAdapter.mValueAngles[0] / 2 + mCurrentStartAngle;
                         Message message = Message.obtain();
                         message.what = TAG_ADJUST_OFFSET_DRAW;
