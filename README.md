@@ -2,44 +2,68 @@
 这是一个简单的饼状图控件。可随手势滑动而旋转，根据滑动的速度做惯性减速，停止旋转后，当前选中项自动居中。
 
 ## step1：在xml布局文件添加
-`<com.tt.rotate_piechart.RotatePieChart
+```
+<com.tt.rotate_piechart.RotatePieChart
         android:id="@+id/pie_chart"
-        android:layout_width="match_parent"       
-        android:layout_height="300dp"/>`
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+```
     
 ## step2:创建PieChartAdapter,指定数据类型并传入数据集合;复写下面三个方法
-`PieChartAdapter adapter = new PieChartAdapter<T>(list)`
+```
+//list是数据集合
+PieChartAdapter adapter = new PieChartAdapter<T>(list)
 
-//返回根据数据的拿个值进行占比判断
-
-`protected float getJudgeData(T bean)`
+//返回占比判断值
+protected float getJudgeData(T bean)
 
 //返回对应position饼状图颜色
-
-`protected int getItemColor(int position)`
+protected int getItemColor(int position)
 
 //选中项回调
-
-`protected void onSelected(int position, T data)`
+protected void onSelected(int position, T data)
+```
 
 ## step3:设置adapter
 `pieChart.setPieChartAdapter(adapter);`
 
 ## 其他属性设置
-`pieChart.setBackgroundColor(Color.RED);//饼状图背景颜色`
+```
+//饼状图背景颜色
+pieChart.setBackgroundColor(Color.RED);
 
-`pieChart.setIndicatorAngle(20);//指示器宽的度数`
+//指示器宽的度数
+pieChart.setIndicatorAngle(20);
 
-`pieChart.setIndicatorHeight(PieChartUtils.dp2px(this, 50));//指示器高度`
+//指示器高度
+pieChart.setIndicatorHeight(PieChartUtils.dp2px(this, 50));
 
-`pieChart.setIndicatorColor(Color.GREEN);//指示器颜色`
+//指示器颜色
+pieChart.setIndicatorColor(Color.GREEN);
 
-`pieChart.setEntranceAnimationDuration(200);//饼状图入场动画时长`
+//饼状图入场动画时长
+pieChart.setEntranceAnimationDuration(200);
 
-`pieChart.setOffsetAnimationDuration(800);//选中项居中偏移动画时长`
+//选中项居中偏移动画时长
+pieChart.setOffsetAnimationDuration(800);
 
-`pieChart.setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20));//外框宽度`
+//外框宽度
+pieChart.setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20));
 
-`pieChart.setOutsideStrokeColor(Color.BLUE);//外框颜色`
+//外框颜色
+pieChart.setOutsideStrokeColor(Color.BLUE);
 
-`pieChart.setStartAngle(0);//饼状图初始绘制起始角度`
+//饼状图初始绘制起始角度
+pieChart.setStartAngle(0);
+```
+
+## 惯性旋转实现原理简单说明：
+![image](https://github.com/csu050416/MarkdownPhotos/blob/master/RotatePieChart20171103151616.png)
+
+    以下说明具体参考PieChartUtils类里面的calculateAngleFromVelocity方法。
+    1、手势up时，计算出当时的velocityX和velocityY，就能得到矢量线速度lineSpeed，并且计算出其与水平线的夹角vectorAngle;
+    2、然后根据up点的坐标值和中心点坐标值，计算up点到中心点的连线与水平线的夹角levelAngle;
+    3、通过vectorAngle与levelAngle获取circleLineAngle;
+    4、勾股定理lineSpeed与circleLineAngle获取circleSpeed；
+    5、角速度 w 与线速度 v 的关系：wr = v，得到角速度，其中r是触摸点到中心点的距离；
+    6、减速度绘制。
