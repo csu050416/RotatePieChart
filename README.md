@@ -8,14 +8,19 @@
         android:layout_height="300dp"/>`
     
 ## step2:创建PieChartAdapter,指定数据类型并传入数据集合;复写下面三个方法
-`//返回根据数据的拿个值进行占比判断
-protected float getJudgeData(T bean)`
+`PieChartAdapter adapter = new PieChartAdapter<T>(list)`
 
-`//返回对应position饼状图颜色
-protected int getItemColor(int position)`
+//返回根据数据的拿个值进行占比判断
 
-`//选中项回调
-protected void onSelected(int position, T data)`
+`protected float getJudgeData(T bean)`
+
+//返回对应position饼状图颜色
+
+`protected int getItemColor(int position)`
+
+//选中项回调
+
+`protected void onSelected(int position, T data)`
 
 ## step3:设置adapter
 `pieChart.setPieChartAdapter(adapter);`
