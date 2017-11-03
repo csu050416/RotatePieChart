@@ -29,32 +29,15 @@ protected void onSelected(int position, T data)
 
 ## 其他属性设置
 ```
-//饼状图背景颜色
-pieChart.setBackgroundColor(Color.RED);
-
-//指示器宽的度数
-pieChart.setIndicatorAngle(20);
-
-//指示器高度
-pieChart.setIndicatorHeight(PieChartUtils.dp2px(this, 50));
-
-//指示器颜色
-pieChart.setIndicatorColor(Color.GREEN);
-
-//饼状图入场动画时长
-pieChart.setEntranceAnimationDuration(200);
-
-//选中项居中偏移动画时长
-pieChart.setOffsetAnimationDuration(800);
-
-//外框宽度
-pieChart.setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20));
-
-//外框颜色
-pieChart.setOutsideStrokeColor(Color.BLUE);
-
-//饼状图初始绘制起始角度
-pieChart.setStartAngle(0);
+pieChart.setPieChartBackgroundColor(Color.RED)//饼状图背景颜色
+        .setIndicatorAngle(20)//指示器宽的度数
+        .setIndicatorHeight(PieChartUtils.dp2px(this, 50))//指示器高度
+        .setIndicatorColor(Color.GREEN)//指示器颜色
+        .setEntranceAnimationDuration(200)//饼状图入场动画时长
+        .setOffsetAnimationDuration(800)//选中项居中偏移动画时长
+        .setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20))//外框宽度
+        .setOutsideStrokeColor(Color.BLUE)//外框颜色
+        .setStartAngle(0)//饼状图初始绘制起始角度
 ```
 
 ## 惯性旋转实现原理简单说明：
