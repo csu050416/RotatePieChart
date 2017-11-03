@@ -124,7 +124,7 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
         //到中心点距离
         float distance = PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, ev.getX(), ev.getY());
         //获取惯性绘制的初始角度
-        float inertiaInitAngle = PieChartUtils.calculateVelocityAngle(velocityX, velocityY, levelAngle, quadrant, distance);
+        float inertiaInitAngle = PieChartUtils.calculateAngleFromVelocity(velocityX, velocityY, levelAngle, quadrant, distance);
         if (Math.abs(inertiaInitAngle) > 1) {
             mChartRenderer.drawInertiaRotate(inertiaInitAngle);
         } else {
