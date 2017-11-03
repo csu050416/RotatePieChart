@@ -11,12 +11,15 @@
 `PieChartAdapter adapter = new PieChartAdapter<T>(list)`
 
 //返回根据数据的拿个值进行占比判断
+
 `protected float getJudgeData(T bean)`
 
 //返回对应position饼状图颜色
+
 `protected int getItemColor(int position)`
 
 //选中项回调
+
 `protected void onSelected(int position, T data)`
 
 ## step3:设置adapter
