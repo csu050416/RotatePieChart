@@ -205,71 +205,80 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * 设置指示器角度
      * @param angle
      */
-    public void setIndicatorAngle(int angle){
+    public RotatePieChart setIndicatorAngle(int angle){
         mChartRenderer.setIndicatorAngle(angle);
+        return this;
     }
 
     /**
      *
      * @param color
      */
-    public void setBackgroundColor(int color){
-        this.mBackgroundColor = color;
+    public RotatePieChart setPieChartBackgroundColor(int color){
+        mBackgroundColor = color;
+        return this;
     }
 
     /**
      * 设置指示器高度
      * @param indicatorHeight
      */
-    public void setIndicatorHeight(int indicatorHeight){
+    public RotatePieChart setIndicatorHeight(int indicatorHeight){
         mChartRenderer.setIndicatorHeight(indicatorHeight);
+        return this;
     }
 
     /**
      * 设置指示器颜色
      * @param indicatorColor
      */
-    public void setIndicatorColor(int indicatorColor){
+    public RotatePieChart setIndicatorColor(int indicatorColor){
         mChartRenderer.setIndicatorColor(indicatorColor);
+        return this;
     }
 
     /**
      * 设置入场动画时长
      * @param duration
      */
-    public void setEntranceAnimationDuration(long duration){
+    public RotatePieChart setEntranceAnimationDuration(long duration){
         mChartRenderer.setEntranceAnimationDuration(duration);
+        return this;
     }
 
     /**
      * 设置矫正偏移动画时长
      * @param duration
      */
-    public void setOffsetAnimationDuration(long duration){
+    public RotatePieChart setOffsetAnimationDuration(long duration){
         mChartRenderer.setOffsetAnimationDuration(duration);
+        return this;
     }
 
     /**
      * 返回外边框宽度
      * @return
      */
-    public void setOutsideStrokeWidth(int strokeWidth){
+    public RotatePieChart setOutsideStrokeWidth(int strokeWidth){
         mChartRenderer.setPieChartStrokeWidth(strokeWidth);
+        return this;
     }
 
     /**
      * 设置外边框颜色
      * @param strokeColor
      */
-    public void setOutsideStrokeColor(int strokeColor){
+    public RotatePieChart setOutsideStrokeColor(int strokeColor){
         mChartRenderer.setPieChartStrokeColor(strokeColor);
+        return this;
     }
 
     /**
      * 设置绘制起始角度
      * @param angle
      */
-    public void setStartAngle(int angle){
+    public RotatePieChart setStartAngle(int angle){
         mChartRenderer.setStartAngle(angle);
+        return this;
     }
 }

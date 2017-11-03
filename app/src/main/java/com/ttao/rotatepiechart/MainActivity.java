@@ -21,15 +21,15 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.text);
 
 
-        //        pieChart.setBackgroundColor(Color.RED);
-        //        pieChart.setIndicatorAngle(20);
-        //        pieChart.setIndicatorHeight(PieChartUtils.dp2px(this, 50));
-        //        pieChart.setIndicatorColor(Color.GREEN);
-        //        pieChart.setEntranceAnimationDuration(200);
-        //        pieChart.setOffsetAnimationDuration(800);
-        //        pieChart.setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20));
-        //        pieChart.setOutsideStrokeColor(Color.BLUE);
-        //        pieChart.setStartAngle(0);
+//        pieChart.setPieChartBackgroundColor(Color.RED)
+//                .setIndicatorAngle(20)
+//                .setIndicatorHeight(PieChartUtils.dp2px(this, 50))
+//                .setIndicatorColor(Color.GREEN)
+//                .setEntranceAnimationDuration(200)
+//                .setOffsetAnimationDuration(800)
+//                .setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20))
+//                .setOutsideStrokeColor(Color.BLUE)
+//                .setStartAngle(0);
 
 
         List<PieChartBean> list = new ArrayList<>();
