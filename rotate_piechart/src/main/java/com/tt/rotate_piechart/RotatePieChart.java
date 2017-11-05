@@ -94,6 +94,13 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                float upX = ev.getX();
+                float upY = ev.getY();
+                boolean isOutsidePointUp = PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, upX, upY) > mRadius;
+                if (isOutsidePointUp) {
+                    mChartRenderer.drawAdjustOffset();
+                    break;
+                }
                 final VelocityTracker velocityTracker = mVelocityTracker;
                 final int pointerId = ev.getPointerId(0);
                 velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
