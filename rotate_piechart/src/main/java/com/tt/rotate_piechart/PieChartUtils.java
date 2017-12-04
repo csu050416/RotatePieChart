@@ -42,6 +42,7 @@ public class PieChartUtils {
 
     /**
      * 获取象限
+     *
      * @return 象限值
      */
     public static int getQuadrant(double x, double y) {
@@ -77,29 +78,32 @@ public class PieChartUtils {
      */
     public static float getPointAngle(float centerX, float centerY, float x, float y) {
         float distance = distanceForTwoPoint(centerX, centerY, x, y);
-        double angle = 0;//弧度
-        if (x > centerX && y < centerY) {//第一象限
-            angle = Math.PI * 2 - Math.asin((centerY - y) / distance);
-        } else if (x < centerX && y < centerY) {//第二象限
-            angle = Math.PI + Math.asin((centerY - y) / distance);
-        } else if (x < centerX && y > centerY) {//第三象限
-            angle = Math.PI - Math.asin((y - centerY) / distance);
-        } else if (x > centerX && y > centerY) {//第四象限
-            angle = Math.asin((y - centerY) / distance);
+        //弧度
+        double radian = 0;
+        if (x > centerX && y < centerY) {
+            radian = Math.PI * 2 - Math.asin((centerY - y) / distance);
+        } else if (x < centerX && y < centerY) {
+            radian = Math.PI + Math.asin((centerY - y) / distance);
+        } else if (x < centerX && y > centerY) {
+            radian = Math.PI - Math.asin((y - centerY) / distance);
+        } else if (x > centerX && y > centerY) {
+            radian = Math.asin((y - centerY) / distance);
         }
-        return radianToAngle(angle);//转角度
+        //转角度
+        return radianToAngle(radian);
     }
 
     /**
      * 根据手势滑动速度，计算角速度
      *
-     * @param velocityX up时x方向的线速度
-     * @param velocityY up时y方向的线速度
+     * @param velocityX  up时x方向的线速度
+     * @param velocityY  up时y方向的线速度
      * @param levelAngle 触点到中心点的线与水平线正方向的夹角
-     * @param quadrant 象限
-     * @param distance 触点到中心店的距离
+     * @param quadrant   象限
+     * @param distance   触点到中心店的距离
      */
-    public static float calculateAngleFromVelocity(float velocityX, float velocityY, float levelAngle, int quadrant, float distance) {
+    public static float calculateAngleFromVelocity(float velocityX, float velocityY, float levelAngle,
+                                                   int quadrant, float distance) {
         //转换成与水平线的夹角
         if (levelAngle > 270) {
             levelAngle = 360 - levelAngle;
@@ -111,65 +115,78 @@ public class PieChartUtils {
         //获得线速度与水平夹角,即矢量速度与水平方向的夹角
         float lineSpeed = (float) Math.sqrt(Math.pow(velocityX, 2) + Math.pow(velocityY, 2));
         float vectorAngle = PieChartUtils.radianToAngle(Math.asin(Math.abs(velocityY) / lineSpeed));
-        if (vectorAngle == levelAngle) {//不需要惯性旋转
+        //不需要惯性旋转
+        if (vectorAngle == levelAngle) {
             return 0;
         }
         //圆切速度与线速度的夹角
         float circleLineAngle;
         boolean isCW;//是否顺时针
-        if(quadrant == 4){
-            if(velocityX > 0 && velocityY < 0){
+        if (quadrant == 4) {
+            if (velocityX > 0 && velocityY < 0) {
                 isCW = false;
                 circleLineAngle = vectorAngle > levelAngle ? vectorAngle - levelAngle : 90 - vectorAngle - levelAngle;
-            }else if(velocityX > 0 && velocityY > 0){
+            } else if (velocityX > 0 && velocityY > 0) {
                 isCW = vectorAngle > levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            } else if(velocityX < 0 && velocityY < 0){
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else if (velocityX < 0 && velocityY < 0) {
                 isCW = vectorAngle < levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            }else {
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else {
                 isCW = true;
-                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90 : 90 - vectorAngle - levelAngle;
+                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90
+                        : 90 - vectorAngle - levelAngle;
             }
-        }else if(quadrant == 3){
-            if(velocityX > 0 && velocityY < 0){
+        } else if (quadrant == 3) {
+            if (velocityX > 0 && velocityY < 0) {
                 isCW = vectorAngle > levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            }else if(velocityX > 0 && velocityY > 0){
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else if (velocityX > 0 && velocityY > 0) {
                 isCW = false;
                 circleLineAngle = vectorAngle > levelAngle ? vectorAngle - levelAngle : vectorAngle + levelAngle;
-            } else if(velocityX < 0 && velocityY > 0){
+            } else if (velocityX < 0 && velocityY > 0) {
                 isCW = vectorAngle < levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            }else{
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else {
                 isCW = true;
-                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90 : 90 - vectorAngle - levelAngle;
+                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90
+                        : 90 - vectorAngle - levelAngle;
             }
-        } else if(quadrant == 2){
-            if(velocityX > 0 && velocityY < 0){
+        } else if (quadrant == 2) {
+            if (velocityX > 0 && velocityY < 0) {
                 isCW = true;
-                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90 : 90 - vectorAngle - levelAngle;
-            }else if(velocityX > 0 && velocityY > 0){
+                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90
+                        : 90 - vectorAngle - levelAngle;
+            } else if (velocityX > 0 && velocityY > 0) {
                 isCW = vectorAngle < levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            } else if(velocityX < 0 && velocityY > 0){
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else if (velocityX < 0 && velocityY > 0) {
                 isCW = false;
                 circleLineAngle = vectorAngle > levelAngle ? vectorAngle - levelAngle : 90 - vectorAngle - levelAngle;
-            }else {
+            } else {
                 isCW = vectorAngle > levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
             }
         } else {
-            if(velocityX > 0 && velocityY < 0){
+            if (velocityX > 0 && velocityY < 0) {
                 isCW = vectorAngle < levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            }else if(velocityX > 0 && velocityY > 0){
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else if (velocityX > 0 && velocityY > 0) {
                 isCW = true;
-                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90 : 90 - vectorAngle - levelAngle;
-            } else if(velocityX < 0 && velocityY > 0){
+                circleLineAngle = vectorAngle > levelAngle ? vectorAngle + levelAngle - 90
+                        : 90 - vectorAngle - levelAngle;
+            } else if (velocityX < 0 && velocityY > 0) {
                 isCW = vectorAngle > levelAngle;
-                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle : 90 + vectorAngle - levelAngle;
-            }else{
+                circleLineAngle = vectorAngle > levelAngle ? 90 - vectorAngle + levelAngle
+                        : 90 + vectorAngle - levelAngle;
+            } else {
                 isCW = false;
                 circleLineAngle = vectorAngle > levelAngle ? vectorAngle - levelAngle : vectorAngle + levelAngle;
             }
@@ -178,19 +195,20 @@ public class PieChartUtils {
         //计算圆切速度,通过弧度计算，角度要先转换为弧度
         double circleSpeed = Math.abs(lineSpeed * Math.cos(circleLineAngle));
         //角速度w与线速度v的关系:  wr = v
-        return (float) (circleSpeed / distance * (isCW ? 1 : -1));//角速度;
+        return (float) (circleSpeed / distance * (isCW ? 1 : -1));
     }
 
     /**
      * 获取初始进入动画动态总角度
      *
      * @param interpolator 插值器
-     * @param judgeValue  判断值
-     * @param targetValue 目标值
-     * @param duration    时长
+     * @param judgeValue   判断值
+     * @param targetValue  目标值
+     * @param duration     时长
      * @return
      */
-    public static float getAnimationTotalAngle(Interpolator interpolator, long judgeValue, float targetValue, long duration) {
+    public static float getAnimationTotalAngle(Interpolator interpolator, long judgeValue, float targetValue,
+                                               long duration) {
         float percent = (System.currentTimeMillis() - judgeValue) * 1.0f / duration;
         percent = percent > 1 ? 1 : percent;
         return interpolator.getInterpolation(percent) * targetValue;

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <declare-styleable name="RotatePieChart">
+        <!--背景颜色-->
+        <attr name="PCBackgroundColor" format="color|reference"/>
+        <!--指示器跨度-->
+        <attr name="PCIndicatorSpanAngle" format="integer"/>
+        <!--指示器高度-->
+        <attr name="PCIndicatorHeightRadiusRate" format="float"/>
+        <!--指示器颜色-->
+        <attr name="PCIndicatorColor" format="color|reference"/>
+        <!--入场动画时长-->
+        <attr name="PCEntranceAnimationDuration" format="integer"/>
+        <!--偏移动画时长-->
+        <attr name="PCOffsetAnimationDuration" format="integer"/>
+        <!--外框宽度-->
+        <attr name="PCOutsideStrokeWidth" format="dimension"/>
+        <!--外框颜色-->
+        <attr name="PCOutsideStrokeColor" format="color|reference"/>
+        <!--绘制起始角度-->
+        <attr name="PCStartAngle" format="integer"/>
+        <!--占比，绘制区域宽高占控件宽高比率（两者最小值）-->
+        <attr name="PCRate" format="float"/>
+    </declare-styleable>
+</resources>

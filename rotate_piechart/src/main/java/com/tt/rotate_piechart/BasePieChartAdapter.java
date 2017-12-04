@@ -11,12 +11,18 @@ import java.util.List;
  * 创建时间：2017/11/1 11:44
  */
 
-public abstract class PieChartAdapter<T> {
-    protected List<T> mPieChartDatas;//数据集合
-    protected float[] mValueAngles;//角度
+public abstract class BasePieChartAdapter<T> {
+    /**
+     * 数据集合
+     */
+    protected List<T> mPieChartDatas;
+    /**
+     * 角度
+     */
+    protected float[] mValueAngles;
     private Observer mObserver;
 
-    public PieChartAdapter(@NonNull List<T> datas) {
+    public BasePieChartAdapter(@NonNull List<T> datas) {
         this.mPieChartDatas = datas;
         this.mValueAngles = new float[datas.size()];
         if (datas.size() > 0) {
@@ -30,23 +36,22 @@ public abstract class PieChartAdapter<T> {
      * @return
      */
     private void valueConvertToAngle() {
-        float[] tempAngles = new float[mPieChartDatas.size()];
         float totalValue = sumDataValue(mPieChartDatas);
         float totalAngle = 0;
         for (int i = 0; i < mPieChartDatas.size(); i++) {
-            tempAngles[i] = getJudgeData(mPieChartDatas.get(i)) * 1.0f / totalValue * 360;
-            totalAngle += tempAngles[i];
+            mValueAngles[i] = getJudgeData(mPieChartDatas.get(i)) * 360 * 1.0f / totalValue;
+            totalAngle += mValueAngles[i];
         }
         //防止总角度小于360，暂且加在最后一个上
         if (totalAngle < 360) {
             float offsetAngle = 360 - totalAngle;
-            tempAngles[mPieChartDatas.size() - 1] += offsetAngle;
+            mValueAngles[mPieChartDatas.size() - 1] += offsetAngle;
         }
-        if (totalAngle > 360) {//超过部分，减在最后一个上
+        //超过部分，减在最后一个上
+        if (totalAngle > 360) {
             float offsetAngle = totalAngle - 360;
-            tempAngles[mPieChartDatas.size() - 1] -= offsetAngle;
+            mValueAngles[mPieChartDatas.size() - 1] -= offsetAngle;
         }
-        this.mValueAngles = tempAngles;
     }
 
     /**
@@ -103,10 +108,14 @@ public abstract class PieChartAdapter<T> {
      * @param position
      * @param data
      */
-    protected abstract void onSelected(int position, T data);
+    protected void onSelected(int position, T data) {
+    }
 
     public interface Observer {
 
+        /**
+         * 更新数据
+         */
         void notifyDataSetChanged();
     }
 }

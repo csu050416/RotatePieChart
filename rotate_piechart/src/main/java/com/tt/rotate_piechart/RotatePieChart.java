@@ -1,6 +1,7 @@
 package com.tt.rotate_piechart;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -9,6 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
+import android.view.animation.Interpolator;
 
 /**
  * 标题：可滑动旋转的饼状图，仿随手记的一个自定义view
@@ -17,21 +19,65 @@ import android.view.ViewConfiguration;
  * 创建时间：2017/11/1 11:15
  */
 
-public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callback, PieChartAdapter.Observer {
-    private float mRatio = 0.9f;//饼状图的占比
-    private PieChartAdapter mChartAdapter;
+public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callback,
+        BasePieChartAdapter.Observer {
+    /**
+     * 饼状图的占比
+     */
+    private float mRatio;
+    /**
+     * 起始角度
+     */
+    private int mStartAngle;
+    /**
+     * 饼状图背景色
+     */
+    private int mBackgroundColor;
+    /**
+     * 指示器的角度
+     */
+    private int mIndicatorAngle;
+    /**
+     * 指示器高度与饼状图半径占比
+     */
+    private float mIndicatorHeightRate;
+    /**
+     * 指示器颜色
+     */
+    private int mIndicatorColor;
+    /**
+     * 入场动画时长
+     */
+    private int mEntranceDuration;
+    /**
+     * 偏移动画时长
+     */
+    private int mOffsetDuration;
+    /**
+     * 外框宽度
+     */
+    private float mOutsideStrokeWidth;
+    /**
+     * 外框颜色
+     */
+    private int mOutsideStrokeColor;
+    private BasePieChartAdapter mChartAdapter;
     private int mCenterX, mCenterY;
-    private int mRadius;//半径
+    private int mRadius;
     private float preMoveX, preMoveY;
-    //手势监听
     private VelocityTracker mVelocityTracker;
     private int mMinimumFlingVelocity;
     private int mMaximumFlingVelocity;
     private SurfaceHolder mHolder;
     private PieChartRenderer mChartRenderer;
-    private int mBackgroundColor = Color.WHITE;
-    private boolean surfaceCreated;//surface是否创建完成
-    private boolean finishEntrance;//是否完成初始绘制
+    /**
+     * surface是否创建完成
+     */
+    private boolean surfaceCreated;
+    /**
+     * 是否完成初始绘制
+     */
+    private boolean finishEntrance;
 
     public RotatePieChart(Context context) {
         this(context, null);
@@ -43,17 +89,38 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     public RotatePieChart(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RotatePieChart);
+        mRatio = array.getFloat(R.styleable.RotatePieChart_PCRate, 0.9f);
+        mStartAngle = array.getInt(R.styleable.RotatePieChart_PCStartAngle, -90);
+        mBackgroundColor = array.getColor(R.styleable.RotatePieChart_PCBackgroundColor, Color.WHITE);
+        mIndicatorAngle = array.getInt(R.styleable.RotatePieChart_PCIndicatorSpanAngle, 30);
+        mIndicatorHeightRate = array.getFloat(R.styleable.RotatePieChart_PCIndicatorHeightRadiusRate, 0.4f);
+        mIndicatorColor = array.getColor(R.styleable.RotatePieChart_PCIndicatorColor, 0xAAFFFFFF);
+        mEntranceDuration = array.getInt(R.styleable.RotatePieChart_PCEntranceAnimationDuration, 600);
+        mOffsetDuration = array.getInt(R.styleable.RotatePieChart_PCOffsetAnimationDuration, 300);
+        mOutsideStrokeWidth = array.getDimension(R.styleable.RotatePieChart_PCOutsideStrokeWidth, 6f);
+        mOutsideStrokeColor = array.getColor(R.styleable.RotatePieChart_PCOutsideStrokeColor, 0xFFDDDDDD);
+        array.recycle();
         init();
     }
 
     private void init() {
         mHolder = getHolder();
         mHolder.addCallback(this);
-        mChartRenderer = new PieChartRenderer(getContext(), this, mHolder);
+        mChartRenderer = new PieChartRenderer(this, mHolder);
         mMinimumFlingVelocity = ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity();
         mMaximumFlingVelocity = ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity();
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
+        setPieChartBackgroundColor(mBackgroundColor);
+        setIndicatorAngle(mIndicatorAngle);
+        setIndicatorHeightRate(mIndicatorHeightRate);
+        setIndicatorColor(mIndicatorColor);
+        setEntranceAnimationDuration(mEntranceDuration);
+        setOffsetAnimationDuration(mOffsetDuration);
+        setOutsideStrokeWidth(mOutsideStrokeWidth);
+        setOutsideStrokeColor(mOutsideStrokeColor);
+        setStartAngle(mStartAngle);
     }
 
     @Override
@@ -68,13 +135,14 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if(mChartAdapter == null)
+        if (mChartAdapter == null) {
             return true;
+        }
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
         }
         mVelocityTracker.addMovement(ev);
-        switch (ev.getAction()){
+        switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 preMoveX = ev.getX();
                 preMoveY = ev.getY();
@@ -83,10 +151,13 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
             case MotionEvent.ACTION_MOVE:
                 float moveX = ev.getX();
                 float moveY = ev.getY();
-                boolean isOutsidePointMove = PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, moveX, moveY) > mRadius;
+                boolean isOutsidePointMove =
+                        PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, moveX, moveY) > mRadius;
                 if (!isOutsidePointMove) {
-                    float preAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, preMoveX, preMoveY);//获取上一个点的角度
-                    float moveAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, moveX, moveY);//获取当前点的角度
+                    //获取上一个点的角度
+                    float preAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, preMoveX, preMoveY);
+                    //获取当前点的角度
+                    float moveAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, moveX, moveY);
                     mChartRenderer.drawTouchRotate(moveAngle - preAngle);
                 }
                 preMoveX = moveX;
@@ -106,24 +177,26 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
                 velocityTracker.computeCurrentVelocity(1000, mMaximumFlingVelocity);
                 final float velocityY = velocityTracker.getYVelocity(pointerId);
                 final float velocityX = velocityTracker.getXVelocity(pointerId);
-                if ((Math.abs(velocityY) > mMinimumFlingVelocity) || (Math.abs(velocityX) > mMinimumFlingVelocity)){
+                if ((Math.abs(velocityY) > mMinimumFlingVelocity) || (Math.abs(velocityX) > mMinimumFlingVelocity)) {
                     onFling(ev, velocityX, velocityY);
-                } else{
+                } else {
                     mChartRenderer.drawAdjustOffset();
                 }
                 break;
-
+            default:
+                break;
         }
         return true;
     }
 
     /**
      * 判断当前滑动速度，并计算惯性初始角度
+     *
      * @param ev
      * @param velocityX
      * @param velocityY
      */
-    private void onFling(MotionEvent ev, float velocityX, float velocityY){
+    private void onFling(MotionEvent ev, float velocityX, float velocityY) {
         //获取触点到中心点的线与水平线正方向的夹角
         float levelAngle = PieChartUtils.getPointAngle(mCenterX, mCenterY, ev.getX(), ev.getY());
         //获取象限
@@ -131,7 +204,8 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
         //到中心点距离
         float distance = PieChartUtils.distanceForTwoPoint(mCenterX, mCenterY, ev.getX(), ev.getY());
         //获取惯性绘制的初始角度
-        float inertiaInitAngle = PieChartUtils.calculateAngleFromVelocity(velocityX, velocityY, levelAngle, quadrant, distance);
+        float inertiaInitAngle = PieChartUtils.calculateAngleFromVelocity(velocityX, velocityY, levelAngle,
+                quadrant, distance);
         if (Math.abs(inertiaInitAngle) > 1) {
             mChartRenderer.drawInertiaRotate(inertiaInitAngle);
         } else {
@@ -141,7 +215,7 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public void notifyDataSetChanged() {
-        if(mChartRenderer != null) {
+        if (mChartRenderer != null) {
             mChartRenderer.reSetStartAngle();
             mChartRenderer.drawEntrance();
         }
@@ -151,8 +225,9 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     public void surfaceCreated(SurfaceHolder holder) {
         mChartRenderer.drawBackgroundColor(mBackgroundColor);
         surfaceCreated = true;
-        if(!finishEntrance && mChartAdapter != null)
+        if (!finishEntrance && mChartAdapter != null) {
             mChartRenderer.drawEntrance();
+        }
     }
 
     @Override
@@ -175,10 +250,10 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      *
      * @param adapter
      */
-    public void setPieChartAdapter(@NonNull PieChartAdapter adapter) {
+    public void setPieChartAdapter(@NonNull BasePieChartAdapter adapter) {
         mChartAdapter = adapter;
         mChartAdapter.setObserver(this);
-        if(surfaceCreated) {
+        if (surfaceCreated) {
             mChartRenderer.drawEntrance();
             finishEntrance = true;
         }
@@ -186,106 +261,138 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     /**
      * 返回中心点坐标
+     *
      * @return
      */
-    public int[] getCenterPoint(){
+    public int[] getCenterPoint() {
         return new int[]{mCenterX, mCenterY};
     }
 
     /**
      * 返回半径
+     *
      * @return
      */
-    public int getPieChartRadius(){
+    public int getPieChartRadius() {
         return mRadius;
     }
 
     /**
      * 获取数据适配器
+     *
      * @return
      */
-    public PieChartAdapter getChartAdapter(){
+    public BasePieChartAdapter getChartAdapter() {
         return mChartAdapter;
     }
 
     /**
      * 设置指示器角度
+     *
      * @param angle
      */
-    public RotatePieChart setIndicatorAngle(int angle){
+    public RotatePieChart setIndicatorAngle(int angle) {
         mChartRenderer.setIndicatorAngle(angle);
         return this;
     }
 
     /**
-     *
      * @param color
      */
-    public RotatePieChart setPieChartBackgroundColor(int color){
+    public RotatePieChart setPieChartBackgroundColor(int color) {
         mBackgroundColor = color;
         return this;
     }
 
     /**
-     * 设置指示器高度
-     * @param indicatorHeight
+     * 设置指示器相对饼状图半径的比例
+     *
+     * @param indicatorHeightRate
      */
-    public RotatePieChart setIndicatorHeight(int indicatorHeight){
-        mChartRenderer.setIndicatorHeight(indicatorHeight);
+    public RotatePieChart setIndicatorHeightRate(float indicatorHeightRate) {
+        mChartRenderer.setIndicatorHeightRate(indicatorHeightRate);
         return this;
     }
 
     /**
      * 设置指示器颜色
+     *
      * @param indicatorColor
      */
-    public RotatePieChart setIndicatorColor(int indicatorColor){
+    public RotatePieChart setIndicatorColor(int indicatorColor) {
         mChartRenderer.setIndicatorColor(indicatorColor);
         return this;
     }
 
     /**
      * 设置入场动画时长
+     *
      * @param duration
      */
-    public RotatePieChart setEntranceAnimationDuration(long duration){
+    public RotatePieChart setEntranceAnimationDuration(long duration) {
         mChartRenderer.setEntranceAnimationDuration(duration);
         return this;
     }
 
     /**
      * 设置矫正偏移动画时长
+     *
      * @param duration
      */
-    public RotatePieChart setOffsetAnimationDuration(long duration){
+    public RotatePieChart setOffsetAnimationDuration(long duration) {
         mChartRenderer.setOffsetAnimationDuration(duration);
         return this;
     }
 
     /**
      * 返回外边框宽度
+     *
      * @return
      */
-    public RotatePieChart setOutsideStrokeWidth(int strokeWidth){
+    public RotatePieChart setOutsideStrokeWidth(float strokeWidth) {
         mChartRenderer.setPieChartStrokeWidth(strokeWidth);
         return this;
     }
 
     /**
      * 设置外边框颜色
+     *
      * @param strokeColor
      */
-    public RotatePieChart setOutsideStrokeColor(int strokeColor){
+    public RotatePieChart setOutsideStrokeColor(int strokeColor) {
         mChartRenderer.setPieChartStrokeColor(strokeColor);
         return this;
     }
 
     /**
      * 设置绘制起始角度
+     *
      * @param angle
      */
-    public RotatePieChart setStartAngle(int angle){
+    public RotatePieChart setStartAngle(int angle) {
         mChartRenderer.setStartAngle(angle);
+        return this;
+    }
+
+    /**
+     * 设置入场动画插值器
+     *
+     * @param interpolator
+     * @return
+     */
+    public RotatePieChart setEntranceInterpolator(Interpolator interpolator){
+        mChartRenderer.setEntranceInterpolator(interpolator);
+        return this;
+    }
+
+    /**
+     * 设置偏移动画插值器
+     *
+     * @param interpolator
+     * @return
+     */
+    public RotatePieChart setOffsetInterpolator(Interpolator interpolator){
+        mChartRenderer.setOffsetInterpolator(interpolator);
         return this;
     }
 }

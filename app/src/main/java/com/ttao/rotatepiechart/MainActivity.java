@@ -2,9 +2,11 @@ package com.ttao.rotatepiechart;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
-import com.tt.rotate_piechart.PieChartAdapter;
+import com.tt.rotate_piechart.BasePieChartAdapter;
 import com.tt.rotate_piechart.RotatePieChart;
 
 import java.util.ArrayList;
@@ -20,24 +22,12 @@ public class MainActivity extends AppCompatActivity {
         RotatePieChart pieChart = findViewById(R.id.pie_chart);
         TextView textView = findViewById(R.id.text);
 
-
-//        pieChart.setPieChartBackgroundColor(Color.RED)
-//                .setIndicatorAngle(20)
-//                .setIndicatorHeight(PieChartUtils.dp2px(this, 50))
-//                .setIndicatorColor(Color.GREEN)
-//                .setEntranceAnimationDuration(200)
-//                .setOffsetAnimationDuration(800)
-//                .setOutsideStrokeWidth(PieChartUtils.dp2px(this, 20))
-//                .setOutsideStrokeColor(Color.BLUE)
-//                .setStartAngle(0);
-
-
         List<PieChartBean> list = new ArrayList<>();
 
         int[] colors = new int[]{0xFFFD9033, 0xFFF98AEC, 0xFFFF3564, 0xFFF566D4, 0xFF58F4Fa,
                 0xFF3D9F33, 0xFF298AEC, 0xFFFF3F64, 0xFFF566a4, 0xFFd8F42a,
                 0xFFF490F3, 0xFF118AEC, 0xFFFFF564, 0xFFF56fD4, 0xFF5dFaFa,
-                0xFFFDF03A, 0xFF000000, 0xFF00FF00, 0xFF000000, 0xFF0000FF};
+                0xFFFDF03A, 0xFF00AD00, 0xFF00FF00, 0xFFD0F0E0, 0xFF0000FF};
 
         for(int i = 1; i < 15; i++){
             Random random = new Random();
@@ -48,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             list.add(bean);
         }
 
-        PieChartAdapter adapter = new PieChartAdapter<PieChartBean>(list) {
+        BasePieChartAdapter adapter = new BasePieChartAdapter<PieChartBean>(list) {
             @Override
             protected float getJudgeData(PieChartBean bean) {
                 return bean.getValue();
@@ -61,10 +51,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onSelected(int position, PieChartBean data) {
-                textView.setText("value:" + data.getValue() + "\ntitle:" + data.getTitle() + "\ndescription:" + data.getDescription());
+                String text = "value:" + data.getValue() + "\ntitle:" + data.getTitle()
+                        + "\ndescription:" + data.getDescription();
+                textView.setText(text);
             }
         };
 
+        /**
+         * 设置动画插值器
+         */
+        pieChart.setEntranceInterpolator(new DecelerateInterpolator())
+                .setOffsetInterpolator(new AccelerateInterpolator());
         pieChart.setPieChartAdapter(adapter);
 
     }

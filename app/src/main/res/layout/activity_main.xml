@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,7 +9,17 @@
     <com.tt.rotate_piechart.RotatePieChart
         android:id="@+id/pie_chart"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp"
+        app:PCIndicatorColor="#80FFFFFF"
+        app:PCBackgroundColor="#FFFFFF"
+        app:PCIndicatorHeightRadiusRate="0.8"
+        app:PCIndicatorSpanAngle="20"
+        app:PCOffsetAnimationDuration="500"
+        app:PCOutsideStrokeColor="#CCCCCC"
+        app:PCOutsideStrokeWidth="9dp"
+        app:PCRate="0.95"
+        app:PCStartAngle="-90"
+        app:PCEntranceAnimationDuration="1000"/>
 
     <TextView
         android:id="@+id/text"
