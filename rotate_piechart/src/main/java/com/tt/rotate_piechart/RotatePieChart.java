@@ -10,6 +10,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
 /**
@@ -69,6 +71,8 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     private int mMinimumFlingVelocity;
     private int mMaximumFlingVelocity;
     private PieChartRenderer mChartRenderer;
+    private Interpolator mEntranceInterpolator = new DecelerateInterpolator();
+    private Interpolator mOffsetInterpolator = new AccelerateInterpolator();
     /**
      * surface是否创建完成
      */
@@ -215,21 +219,18 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     @Override
     public void notifyDataSetChanged() {
         if (mChartRenderer != null) {
-            mChartRenderer.reSetStartAngle();
-            mChartRenderer.drawEntrance();
-            finishEntrance = true;
+            entranceRenderer();
         }
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mChartRenderer.drawBackgroundColor(mBackgroundColor);
+        mChartRenderer.drawBackgroundColor();
         surfaceCreated = true;
         if(mChartAdapter == null)
             return;
         if (!finishEntrance) {
-            mChartRenderer.drawEntrance();
-            finishEntrance = true;
+            entranceRenderer();
         } else {
             mChartRenderer.drawTouchRotate(0);
         }
@@ -259,9 +260,17 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
         mChartAdapter = adapter;
         mChartAdapter.setObserver(this);
         if (surfaceCreated) {
-            mChartRenderer.drawEntrance();
-            finishEntrance = true;
+            entranceRenderer();
         }
+    }
+
+    /**
+     * 渲染入场动画
+     */
+    private void entranceRenderer(){
+        mChartRenderer.reSetStartAngle();
+        mChartRenderer.drawEntrance();
+        finishEntrance = true;
     }
 
     /**
@@ -297,16 +306,24 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @param angle
      */
     public RotatePieChart setIndicatorAngle(int angle) {
-        mChartRenderer.setIndicatorAngle(angle);
+        this.mIndicatorAngle = angle;
         return this;
+    }
+
+    public int getIndicatorAngle() {
+        return mIndicatorAngle;
     }
 
     /**
      * @param color
      */
     public RotatePieChart setPieChartBackgroundColor(int color) {
-        mBackgroundColor = color;
+        this.mBackgroundColor = color;
         return this;
+    }
+
+    public int getPieChartBackgroundColor() {
+        return mBackgroundColor;
     }
 
     /**
@@ -315,8 +332,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @param indicatorHeightRate
      */
     public RotatePieChart setIndicatorHeightRate(float indicatorHeightRate) {
-        mChartRenderer.setIndicatorHeightRate(indicatorHeightRate);
+        this.mIndicatorHeightRate = indicatorHeightRate;
         return this;
+    }
+
+    public float getIndicatorHeightRate() {
+        return mIndicatorHeightRate;
     }
 
     /**
@@ -325,8 +346,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @param indicatorColor
      */
     public RotatePieChart setIndicatorColor(int indicatorColor) {
-        mChartRenderer.setIndicatorColor(indicatorColor);
+        this.mIndicatorColor = indicatorColor;
         return this;
+    }
+
+    public int getIndicatorColor() {
+        return mIndicatorColor;
     }
 
     /**
@@ -334,9 +359,13 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      *
      * @param duration
      */
-    public RotatePieChart setEntranceAnimationDuration(long duration) {
-        mChartRenderer.setEntranceAnimationDuration(duration);
+    public RotatePieChart setEntranceAnimationDuration(int duration) {
+        this.mEntranceDuration = duration;
         return this;
+    }
+
+    public int getEntranceDuration() {
+        return mEntranceDuration;
     }
 
     /**
@@ -344,9 +373,13 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      *
      * @param duration
      */
-    public RotatePieChart setOffsetAnimationDuration(long duration) {
-        mChartRenderer.setOffsetAnimationDuration(duration);
+    public RotatePieChart setOffsetAnimationDuration(int duration) {
+        this.mOffsetDuration = duration;
         return this;
+    }
+
+    public int getOffsetDuration() {
+        return mOffsetDuration;
     }
 
     /**
@@ -355,8 +388,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @return
      */
     public RotatePieChart setOutsideStrokeWidth(float strokeWidth) {
-        mChartRenderer.setPieChartStrokeWidth(strokeWidth);
+        this.mOutsideStrokeWidth = strokeWidth;
         return this;
+    }
+
+    public float getOutsideStrokeWidth() {
+        return mOutsideStrokeWidth;
     }
 
     /**
@@ -365,8 +402,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @param strokeColor
      */
     public RotatePieChart setOutsideStrokeColor(int strokeColor) {
-        mChartRenderer.setPieChartStrokeColor(strokeColor);
+        this.mOutsideStrokeColor = strokeColor;
         return this;
+    }
+
+    public int getOutsideStrokeColor() {
+        return mOutsideStrokeColor;
     }
 
     /**
@@ -375,8 +416,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @param angle
      */
     public RotatePieChart setStartAngle(int angle) {
-        mChartRenderer.setStartAngle(angle);
+        this.mStartAngle = angle;
         return this;
+    }
+
+    public int getStartAngle() {
+        return mStartAngle;
     }
 
     /**
@@ -386,8 +431,12 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @return
      */
     public RotatePieChart setEntranceInterpolator(Interpolator interpolator){
-        mChartRenderer.setEntranceInterpolator(interpolator);
+        this.mEntranceInterpolator = interpolator;
         return this;
+    }
+
+    public Interpolator getEntranceInterpolator() {
+        return mEntranceInterpolator;
     }
 
     /**
@@ -397,7 +446,11 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
      * @return
      */
     public RotatePieChart setOffsetInterpolator(Interpolator interpolator){
-        mChartRenderer.setOffsetInterpolator(interpolator);
+        this.mOffsetInterpolator = interpolator;
         return this;
+    }
+
+    public Interpolator getOffsetInterpolator() {
+        return mOffsetInterpolator;
     }
 }

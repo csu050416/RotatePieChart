@@ -11,9 +11,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.view.SurfaceHolder;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 
 /**
  * 标题: 渲染器
@@ -34,20 +31,15 @@ public class PieChartRenderer {
     public final static int TAG_TOUCH_ROTATE_DRAW = 2;
     public final static int TAG_INERTIA_ROTATE_DRAW = 3;
     public final static int TAG_ADJUST_OFFSET_DRAW = 4;
-    private float mInitStartAngle;
     /**
      * 当前绘制开始角度
      */
-    private float mCurrentStartAngle = mInitStartAngle;
-    private long mEntranceAnimationDuration;
-    private long mOffsetAnimationDuration;
+    private float mCurrentStartAngle;
     private RotatePieChart mPieChart;
     private Canvas mCanvas;
     private SurfaceHolder mSurfaceHolder;
     private Paint mPiePaint, mCirclePaint, mIndicatorPaint;
     private Path mIndicatorPath;
-    private Interpolator mEntranceInterpolator = new DecelerateInterpolator();
-    private Interpolator mOffsetInterpolator = new AccelerateInterpolator();
     private long mEntranceTime, mOffsetStartTime;
     private BasePieChartAdapter mChartAdapter;
     private RectF mRectF;
@@ -55,12 +47,6 @@ public class PieChartRenderer {
      * 标记是否中途取消了某个绘制
      */
     private boolean isCancel;
-    private int mIndicatorAngle;
-    private float mIndicatorHeightRadiusRate;
-    private int mIndicatorColor;
-    private float mStrokeWidth;
-    private int mStrokeColor;
-    private int mBackgroundColor;
     /**
      * 添加绘制线程
      */
@@ -95,19 +81,23 @@ public class PieChartRenderer {
 
     /**
      * 画背景
-     *
-     * @param backgroundColor
      */
-    public void drawBackgroundColor(int backgroundColor) {
-        mBackgroundColor = backgroundColor;
+    public void drawBackgroundColor() {
         mCanvas = mSurfaceHolder.lockCanvas();
-        //1.清除画面
-        mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        //2.画背景
-        mCanvas.drawColor(backgroundColor);
+        clearPieChart();
         if (mCanvas != null) {
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
+    }
+
+    /**
+     * 清除饼状图画面
+     */
+    private void clearPieChart(){
+        //1.清除画面
+        mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        //2.画背景
+        mCanvas.drawColor(mPieChart.getPieChartBackgroundColor());
     }
 
     /**
@@ -124,7 +114,7 @@ public class PieChartRenderer {
      * 重置绘制开始角度
      */
     public void reSetStartAngle() {
-        mCurrentStartAngle = mInitStartAngle;
+        mCurrentStartAngle = mPieChart.getStartAngle();
     }
 
     /**
@@ -216,47 +206,6 @@ public class PieChartRenderer {
         return 0;
     }
 
-    public void setEntranceAnimationDuration(long duration) {
-        mEntranceAnimationDuration = duration;
-    }
-
-    public void setOffsetAnimationDuration(long duration) {
-        mOffsetAnimationDuration = duration;
-    }
-
-    public void setIndicatorAngle(int angle) {
-        this.mIndicatorAngle = angle;
-    }
-
-    public void setIndicatorColor(int color) {
-        this.mIndicatorColor = color;
-    }
-
-    public void setIndicatorHeightRate(float heightRadiusRate) {
-        this.mIndicatorHeightRadiusRate = heightRadiusRate;
-    }
-
-    public void setPieChartStrokeColor(int color) {
-        this.mStrokeColor = color;
-    }
-
-    public void setPieChartStrokeWidth(float strokeWidth) {
-        this.mStrokeWidth = strokeWidth;
-    }
-
-    public void setEntranceInterpolator(Interpolator interpolator){
-        mEntranceInterpolator = interpolator;
-    }
-
-    public void setOffsetInterpolator(Interpolator interpolator){
-        mOffsetInterpolator = interpolator;
-    }
-
-    public void setStartAngle(int angle) {
-        mInitStartAngle = angle;
-        mCurrentStartAngle = angle;
-    }
-
     /**
      * 线程释放
      */
@@ -292,10 +241,7 @@ public class PieChartRenderer {
             mRectF = new RectF(centerPoint[0] - radius, centerPoint[1] - radius,
                     centerPoint[0] + radius, centerPoint[1] + radius);
             mCanvas = mSurfaceHolder.lockCanvas();
-            //1.清除画面
-            mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            //2.画背景
-            mCanvas.drawColor(mBackgroundColor);
+            clearPieChart();
             //3.画饼状图
             switch (msg.what) {
                 case TAG_ENTRANCE_DRAW:
@@ -303,8 +249,8 @@ public class PieChartRenderer {
                         mEntranceTime = System.currentTimeMillis();
                     }
                     //获取当前动画总角度
-                    float animationTotalAngle = PieChartUtils.getAnimationTotalAngle(mEntranceInterpolator,
-                            mEntranceTime, 360, mEntranceAnimationDuration);
+                    float animationTotalAngle = PieChartUtils.getAnimationTotalAngle(mPieChart.getEntranceInterpolator(),
+                            mEntranceTime, 360, mPieChart.getEntranceDuration());
                     float startAngle = mCurrentStartAngle;
                     for (int i = 0; i < mChartAdapter.mValueAngles.length; i++) {
                         mPiePaint.setColor(mChartAdapter.getItemColor(i));
@@ -359,8 +305,8 @@ public class PieChartRenderer {
                     //获取要偏移的角度
                     float offsetAngle = afterStartAngle - mCurrentStartAngle + mAnimationOffsetAngle;
                     //获取当前动画角度
-                    mAnimationOffsetAngle = PieChartUtils.getAnimationTotalAngle(mOffsetInterpolator,
-                            mOffsetStartTime, offsetAngle, mOffsetAnimationDuration);
+                    mAnimationOffsetAngle = PieChartUtils.getAnimationTotalAngle(mPieChart.getOffsetInterpolator(),
+                            mOffsetStartTime, offsetAngle, mPieChart.getOffsetDuration());
                     //起始角度偏移量
                     mCurrentStartAngle = afterStartAngle - offsetAngle + mAnimationOffsetAngle;
                     drawItemChart(mCurrentStartAngle);
@@ -379,17 +325,19 @@ public class PieChartRenderer {
                     break;
             }
             //4.画外框
-            mCirclePaint.setStrokeWidth(mStrokeWidth);
-            mCirclePaint.setColor(mStrokeColor);
-            mCanvas.drawCircle(centerPoint[0], centerPoint[1], radius - mStrokeWidth / 2, mCirclePaint);
+            float strokeWidth = mPieChart.getOutsideStrokeWidth();
+            mCirclePaint.setStrokeWidth(strokeWidth);
+            mCirclePaint.setColor(mPieChart.getOutsideStrokeColor());
+            mCanvas.drawCircle(centerPoint[0], centerPoint[1], radius - strokeWidth / 2, mCirclePaint);
             //5.画指示三角
             mIndicatorPath.reset();
-            float indicatorHeight = mPieChart.getPieChartRadius() * mIndicatorHeightRadiusRate;
+            float indicatorHeight = mPieChart.getPieChartRadius() * mPieChart.getIndicatorHeightRate();
             RectF rectF = new RectF(centerPoint[0] - radius, centerPoint[1] - radius,
                     centerPoint[0] + radius, centerPoint[1] + radius);
-            mIndicatorPath.addArc(rectF, 90 - mIndicatorAngle / 2, mIndicatorAngle);
+            int indicatorAngle = mPieChart.getIndicatorAngle();
+            mIndicatorPath.addArc(rectF, 90 - indicatorAngle / 2, indicatorAngle);
             mIndicatorPath.lineTo(centerPoint[0], centerPoint[1] + radius - indicatorHeight);
-            mIndicatorPaint.setColor(mIndicatorColor);
+            mIndicatorPaint.setColor(mPieChart.getIndicatorColor());
             mCanvas.drawPath(mIndicatorPath, mIndicatorPaint);
             if (mCanvas != null) {
                 mSurfaceHolder.unlockCanvasAndPost(mCanvas);
