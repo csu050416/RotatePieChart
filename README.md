@@ -42,6 +42,7 @@ protected void onSelected(int position, float percentValue, T data)
 `pieChart.setPieChartAdapter(adapter);`
 
 设置adapter之后，动态改变数据需要调用：
+
 `adapter.notifyDatasetChanged();`
 
 ## 其他属性设置
