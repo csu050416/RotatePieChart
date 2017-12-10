@@ -1,6 +1,9 @@
 # RotatePieChart
 这是一个简单的饼状图控件。可随手势滑动而旋转，根据滑动的速度做惯性减速，停止旋转后，当前选中项自动居中。
 
+# 效果图
+![image](https://github.com/csu050416/MarkdownPhotos/blob/master/rotatepiechart.gif)
+
 ## step1：在xml布局文件添加
 ```
 <com.tt.rotate_piechart.RotatePieChart
