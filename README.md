@@ -35,11 +35,14 @@ protected float getJudgeData(T bean)
 protected int getItemColor(int position)
 
 //选中项回调
-protected void onSelected(int position, T data)
+protected void onSelected(int position, float percentValue, T data)
 ```
 
 ## step3:设置adapter
 `pieChart.setPieChartAdapter(adapter);`
+
+设置adapter之后，动态改变数据需要调用：
+`adapter.notifyDatasetChanged();`
 
 ## 其他属性设置
 
