@@ -12,7 +12,7 @@
         android:layout_height="300dp"
         app:PCIndicatorColor="#80FFFFFF"
         app:PCBackgroundColor="#FFFFFF"
-        app:PCIndicatorHeightRadiusRate="0.8"
+        app:PCIndicatorHeightRadiusRate="0.4"
         app:PCIndicatorSpanAngle="20"
         app:PCOffsetAnimationDuration="500"
         app:PCOutsideStrokeColor="#CCCCCC"

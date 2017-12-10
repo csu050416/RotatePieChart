@@ -55,10 +55,6 @@ public class PieChartRenderer {
      * 标记是否中途取消了某个绘制
      */
     private boolean isCancel;
-    /**
-     * 标记偏移是否重置开始
-     */
-    private boolean isOffsetStart;
     private int mIndicatorAngle;
     private float mIndicatorHeightRadiusRate;
     private int mIndicatorColor;
@@ -159,7 +155,7 @@ public class PieChartRenderer {
      */
     public void drawAdjustOffset() {
         isCancel = false;
-        isOffsetStart = true;
+        mOffsetStartTime = 0;
         float offsetAngle = getCurrentIndicatorOffsetAngle();
         Message message = Message.obtain();
         message.what = TAG_ADJUST_OFFSET_DRAW;
@@ -265,9 +261,14 @@ public class PieChartRenderer {
      * 线程释放
      */
     public void detachedFromWindow() {
-        mCanvasDrawHandler.removeCallbacksAndMessages(null);
+        if(mCanvasDrawHandler != null)
+            mCanvasDrawHandler.removeCallbacksAndMessages(null);
         if (mCanvasDrawThread != null) {
             mCanvasDrawThread.quit();
+        }
+        if(mMainThreadHandler != null) {
+            mMainThreadHandler.removeCallbacksAndMessages(null);
+            mMainThreadHandler = null;
         }
     }
 
@@ -319,7 +320,7 @@ public class PieChartRenderer {
                         //将第一个数据中间偏移到底部，在入场动画完成之后
                         float afterStartAngle = Math.abs(90 - mCurrentStartAngle)
                                 - mChartAdapter.mValueAngles[0] / 2 + mCurrentStartAngle;
-                        isOffsetStart = true;
+                        mOffsetStartTime = 0;
                         Message message = Message.obtain();
                         message.what = TAG_ADJUST_OFFSET_DRAW;
                         message.obj = afterStartAngle;
@@ -341,7 +342,7 @@ public class PieChartRenderer {
                         message.obj = inertiaInitAngle;
                         mCanvasDrawHandler.sendMessage(message);
                     } else {
-                        isOffsetStart = true;
+                        mOffsetStartTime = 0;
                         float offsetAngle = getCurrentIndicatorOffsetAngle();
                         Message message = Message.obtain();
                         message.what = TAG_ADJUST_OFFSET_DRAW;
@@ -351,8 +352,7 @@ public class PieChartRenderer {
                     break;
                 case TAG_ADJUST_OFFSET_DRAW:
                     float afterStartAngle = (float) msg.obj;
-                    if (isOffsetStart) {
-                        isOffsetStart = false;
+                    if (mOffsetStartTime == 0) {
                         mOffsetStartTime = System.currentTimeMillis();
                         mAnimationOffsetAngle = 0;
                     }

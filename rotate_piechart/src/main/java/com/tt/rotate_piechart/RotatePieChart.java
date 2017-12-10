@@ -68,7 +68,6 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     private VelocityTracker mVelocityTracker;
     private int mMinimumFlingVelocity;
     private int mMaximumFlingVelocity;
-    private SurfaceHolder mHolder;
     private PieChartRenderer mChartRenderer;
     /**
      * surface是否创建完成
@@ -105,9 +104,9 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     }
 
     private void init() {
-        mHolder = getHolder();
-        mHolder.addCallback(this);
-        mChartRenderer = new PieChartRenderer(this, mHolder);
+        SurfaceHolder holder = getHolder();
+        holder.addCallback(this);
+        mChartRenderer = new PieChartRenderer(this, holder);
         mMinimumFlingVelocity = ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity();
         mMaximumFlingVelocity = ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity();
         this.setFocusable(true);
@@ -218,6 +217,7 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
         if (mChartRenderer != null) {
             mChartRenderer.reSetStartAngle();
             mChartRenderer.drawEntrance();
+            finishEntrance = true;
         }
     }
 
@@ -225,8 +225,13 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
     public void surfaceCreated(SurfaceHolder holder) {
         mChartRenderer.drawBackgroundColor(mBackgroundColor);
         surfaceCreated = true;
-        if (!finishEntrance && mChartAdapter != null) {
+        if(mChartAdapter == null)
+            return;
+        if (!finishEntrance) {
             mChartRenderer.drawEntrance();
+            finishEntrance = true;
+        } else {
+            mChartRenderer.drawTouchRotate(0);
         }
     }
 

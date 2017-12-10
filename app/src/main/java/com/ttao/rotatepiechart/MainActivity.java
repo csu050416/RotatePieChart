@@ -29,11 +29,11 @@ public class MainActivity extends AppCompatActivity {
                 0xFFF490F3, 0xFF118AEC, 0xFFFFF564, 0xFFF56fD4, 0xFF5dFaFa,
                 0xFFFDF03A, 0xFF00AD00, 0xFF00FF00, 0xFFD0F0E0, 0xFF0000FF};
 
-        for(int i = 1; i < 15; i++){
+        for(int i = 0; i < 15; i++){
             Random random = new Random();
             PieChartBean bean = new PieChartBean();
             bean.setTitle("标题"+ i);
-            bean.setValue(random.nextInt(100) + i * random.nextInt(50) + random.nextInt(10));
+            bean.setValue(random.nextInt(100) + (i + 1) * random.nextInt(50) + random.nextInt(10));
             bean.setDescription("描述" + i);
             list.add(bean);
         }
