@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RotatePieChart</string>
+    <string name="btn_text_add">增加数据</string>
+    <string name="btn_text_deduct">减少数据</string>
 </resources>

@@ -29,4 +29,9 @@
         android:padding="10dp"
         android:gravity="center"/>
 
+    <Button
+        android:id="@+id/btn_change_data"
+        android:text="@string/btn_text_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
