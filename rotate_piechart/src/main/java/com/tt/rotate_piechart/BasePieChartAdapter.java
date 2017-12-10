@@ -1,6 +1,7 @@
 package com.tt.rotate_piechart;
 
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 
 import java.util.List;
 
@@ -19,12 +20,12 @@ public abstract class BasePieChartAdapter<T> {
     /**
      * 角度
      */
-    protected float[] mValueAngles;
+    protected SparseArray<Float> mValueAngles;
     private Observer mObserver;
 
     public BasePieChartAdapter(@NonNull List<T> datas) {
         this.mPieChartDatas = datas;
-        this.mValueAngles = new float[datas.size()];
+        this.mValueAngles = new SparseArray<>(datas.size());
         if (datas.size() > 0) {
             valueConvertToAngle();
         }
@@ -38,19 +39,16 @@ public abstract class BasePieChartAdapter<T> {
     private void valueConvertToAngle() {
         float totalValue = sumDataValue(mPieChartDatas);
         float totalAngle = 0;
+        mValueAngles.clear();
         for (int i = 0; i < mPieChartDatas.size(); i++) {
-            mValueAngles[i] = getJudgeData(mPieChartDatas.get(i)) * 360 * 1.0f / totalValue;
-            totalAngle += mValueAngles[i];
-        }
-        //防止总角度小于360，暂且加在最后一个上
-        if (totalAngle < 360) {
-            float offsetAngle = 360 - totalAngle;
-            mValueAngles[mPieChartDatas.size() - 1] += offsetAngle;
-        }
-        //超过部分，减在最后一个上
-        if (totalAngle > 360) {
-            float offsetAngle = totalAngle - 360;
-            mValueAngles[mPieChartDatas.size() - 1] -= offsetAngle;
+            float v = getJudgeData(mPieChartDatas.get(i)) * 360 * 1.0f / totalValue;
+            totalAngle += v;
+            //最后一个判断总角度是否为360，偏差作用与最后一个值上
+            if(i == mPieChartDatas.size() - 1 && totalAngle != 360) {
+                float offsetAngle = 360 - totalAngle;
+                v += offsetAngle;
+            }
+            mValueAngles.append(i, v);
         }
     }
 
@@ -93,7 +91,6 @@ public abstract class BasePieChartAdapter<T> {
      */
     protected abstract float getJudgeData(T bean);
 
-
     /**
      * 获取颜色
      *
@@ -106,9 +103,10 @@ public abstract class BasePieChartAdapter<T> {
      * 当前选中
      *
      * @param position
-     * @param data
+     * @param percentValue 百分占比
+     * @param data 数据对象
      */
-    protected void onSelected(int position, T data) {
+    protected void onSelected(int position, float percentValue, T data) {
     }
 
     public interface Observer {

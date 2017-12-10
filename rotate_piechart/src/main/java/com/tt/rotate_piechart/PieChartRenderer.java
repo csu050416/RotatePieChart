@@ -19,7 +19,7 @@ import android.view.SurfaceHolder;
  * 创建时间：2017/11/1 11:50
  */
 
-public class PieChartRenderer {
+public class PieChartRenderer<T> {
     /**
      * 绘制标记
      * 1：初始入场动画绘制
@@ -41,7 +41,7 @@ public class PieChartRenderer {
     private Paint mPiePaint, mCirclePaint, mIndicatorPaint;
     private Path mIndicatorPath;
     private long mEntranceTime, mOffsetStartTime;
-    private BasePieChartAdapter mChartAdapter;
+    private BasePieChartAdapter<T> mChartAdapter;
     private RectF mRectF;
     /**
      * 标记是否中途取消了某个绘制
@@ -93,7 +93,7 @@ public class PieChartRenderer {
     /**
      * 清除饼状图画面
      */
-    private void clearPieChart(){
+    private void clearPieChart() {
         //1.清除画面
         mCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         //2.画背景
@@ -105,6 +105,7 @@ public class PieChartRenderer {
      */
     public void drawEntrance() {
         isCancel = false;
+        mEntranceTime = 0;
         Message message = Message.obtain();
         message.what = TAG_ENTRANCE_DRAW;
         mCanvasDrawHandler.sendMessage(message);
@@ -172,11 +173,11 @@ public class PieChartRenderer {
         if (mCurrentStartAngle < -270) {
             calculateStartAngle = 360 + mCurrentStartAngle;
         }
-        for (int i = 0; i < mChartAdapter.mValueAngles.length; i++) {
-            calculateStartAngle += mChartAdapter.mValueAngles[i];
+        for (int i = 0; i < mChartAdapter.mValueAngles.size(); i++) {
+            calculateStartAngle += mChartAdapter.mValueAngles.get(i);
             if (calculateStartAngle >= 90) {
                 //当前居中需要偏移的角度
-                return mChartAdapter.mValueAngles[i] / 2 - (calculateStartAngle - 90);
+                return mChartAdapter.mValueAngles.get(i) / 2 - (calculateStartAngle - 90);
             }
         }
         return 0;
@@ -197,8 +198,8 @@ public class PieChartRenderer {
         if (mCurrentStartAngle < -270) {
             calculateStartAngle = 360 + mCurrentStartAngle;
         }
-        for (int i = 0; i < mChartAdapter.mValueAngles.length; i++) {
-            calculateStartAngle += mChartAdapter.mValueAngles[i];
+        for (int i = 0; i < mChartAdapter.mValueAngles.size(); i++) {
+            calculateStartAngle += mChartAdapter.mValueAngles.get(i);
             if (calculateStartAngle > 90) {
                 return i;
             }
@@ -210,12 +211,12 @@ public class PieChartRenderer {
      * 线程释放
      */
     public void detachedFromWindow() {
-        if(mCanvasDrawHandler != null)
+        if (mCanvasDrawHandler != null)
             mCanvasDrawHandler.removeCallbacksAndMessages(null);
         if (mCanvasDrawThread != null) {
             mCanvasDrawThread.quit();
         }
-        if(mMainThreadHandler != null) {
+        if (mMainThreadHandler != null) {
             mMainThreadHandler.removeCallbacksAndMessages(null);
             mMainThreadHandler = null;
         }
@@ -233,7 +234,7 @@ public class PieChartRenderer {
                 mChartAdapter = mPieChart.getChartAdapter();
             }
             if (isCancel || mChartAdapter.mValueAngles == null
-                    || mChartAdapter.mValueAngles.length == 0) {
+                    || mChartAdapter.mValueAngles.size() == 0) {
                 return;
             }
             int[] centerPoint = mPieChart.getCenterPoint();
@@ -249,12 +250,13 @@ public class PieChartRenderer {
                         mEntranceTime = System.currentTimeMillis();
                     }
                     //获取当前动画总角度
-                    float animationTotalAngle = PieChartUtils.getAnimationTotalAngle(mPieChart.getEntranceInterpolator(),
+                    float animationTotalAngle = PieChartUtils.getAnimationTotalAngle(mPieChart
+                                    .getEntranceInterpolator(),
                             mEntranceTime, 360, mPieChart.getEntranceDuration());
                     float startAngle = mCurrentStartAngle;
-                    for (int i = 0; i < mChartAdapter.mValueAngles.length; i++) {
+                    for (int i = 0; i < mChartAdapter.mValueAngles.size(); i++) {
                         mPiePaint.setColor(mChartAdapter.getItemColor(i));
-                        float angle = mChartAdapter.mValueAngles[i] * animationTotalAngle / 360;
+                        float angle = mChartAdapter.mValueAngles.get(i) * animationTotalAngle / 360;
                         mCanvas.drawArc(mRectF, startAngle, angle, true, mPiePaint);
                         startAngle += angle;
                     }
@@ -265,7 +267,7 @@ public class PieChartRenderer {
                     } else {
                         //将第一个数据中间偏移到底部，在入场动画完成之后
                         float afterStartAngle = Math.abs(90 - mCurrentStartAngle)
-                                - mChartAdapter.mValueAngles[0] / 2 + mCurrentStartAngle;
+                                - mChartAdapter.mValueAngles.get(0) / 2 + mCurrentStartAngle;
                         mOffsetStartTime = 0;
                         Message message = Message.obtain();
                         message.what = TAG_ADJUST_OFFSET_DRAW;
@@ -352,7 +354,8 @@ public class PieChartRenderer {
                 mMainThreadHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mChartAdapter.onSelected(position,
+                        float percent = mChartAdapter.mValueAngles.get(position) * 100 / 360;
+                        mChartAdapter.onSelected(position, PieChartUtils.round(percent, 2),
                                 mChartAdapter.mPieChartDatas.get(position));
                     }
                 });
@@ -360,10 +363,10 @@ public class PieChartRenderer {
         }
 
         private void drawItemChart(float startAngle) {
-            for (int i = 0; i < mChartAdapter.mValueAngles.length; i++) {
+            for (int i = 0; i < mChartAdapter.mValueAngles.size(); i++) {
                 mPiePaint.setColor(mChartAdapter.getItemColor(i));
-                mCanvas.drawArc(mRectF, startAngle, mChartAdapter.mValueAngles[i], true, mPiePaint);
-                startAngle += mChartAdapter.mValueAngles[i];
+                mCanvas.drawArc(mRectF, startAngle, mChartAdapter.mValueAngles.get(i), true, mPiePaint);
+                startAngle += mChartAdapter.mValueAngles.get(i);
             }
         }
     }
