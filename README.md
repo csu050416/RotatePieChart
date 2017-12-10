@@ -5,13 +5,24 @@
 ![image](https://github.com/csu050416/MarkdownPhotos/blob/master/rotatepiechart.gif)
 
 ## step1：在xml布局文件添加
+
 ```
 <com.tt.rotate_piechart.RotatePieChart
         android:id="@+id/pie_chart"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp"
+        app:PCIndicatorColor="#80FFFFFF"
+        app:PCBackgroundColor="#FFFFFF"
+        app:PCIndicatorHeightRadiusRate="0.4"
+        app:PCIndicatorSpanAngle="20"
+        app:PCOffsetAnimationDuration="400"
+        app:PCOutsideStrokeColor="#CCCCCC"
+        app:PCOutsideStrokeWidth="9dp"
+        app:PCRate="0.95"
+        app:PCStartAngle="-90"
+        app:PCEntranceAnimationDuration="1000"/>
 ```
-    
+
 ## step2:创建PieChartAdapter,指定数据类型并传入数据集合;复写下面三个方法
 ```
 //list是数据集合
@@ -31,6 +42,8 @@ protected void onSelected(int position, T data)
 `pieChart.setPieChartAdapter(adapter);`
 
 ## 其他属性设置
+
+除在xml布局文件设置外，也可通过代码动态设置：
 ```
 pieChart.setPieChartBackgroundColor(Color.RED)//饼状图背景颜色
         .setIndicatorAngle(20)//指示器宽的度数
