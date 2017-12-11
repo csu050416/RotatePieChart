@@ -14,11 +14,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 
-import com.tt.rotate_piechart.BasePieChartAdapter;
-import com.tt.rotate_piechart.PieChartRenderer;
-import com.tt.rotate_piechart.PieChartUtils;
-import com.tt.rotate_piechart.R;
-
 /**
  * 标题：可滑动旋转的饼状图，仿随手记的一个自定义view
  * 描述：

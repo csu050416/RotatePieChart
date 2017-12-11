@@ -12,7 +12,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.view.SurfaceHolder;
 
-import com.tt.rotate_piechart.BasePieChartAdapter;
 
 /**
  * 标题: 渲染器
