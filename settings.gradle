@@ -1,1 +1,1 @@
-include ':app', ':rotate_piechart'
+include ':app', ':rotatepiechart'
