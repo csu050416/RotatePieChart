@@ -8,8 +8,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.tt.rotate_piechart.BasePieChartAdapter;
-import com.tt.rotate_piechart.RotatePieChart;
+import com.tt.rotatepiechart.BasePieChartAdapter;
+import com.tt.rotatepiechart.RotatePieChart;
 
 import java.util.ArrayList;
 import java.util.List;
