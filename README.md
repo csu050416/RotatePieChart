@@ -4,6 +4,13 @@
 # 效果图
 ![image](https://github.com/csu050416/MarkdownPhotos/blob/master/rotatepiechart.gif)
 
+# JCenter 引入方法
+build.gradle添加:
+
+`compile 'com.tt.rotatepiechart:rotatepiechart:1.0.0'`
+
+
+# 使用介绍
 ## step1：在xml布局文件添加
 
 ```
