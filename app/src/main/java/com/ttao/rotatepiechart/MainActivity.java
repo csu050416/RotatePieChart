@@ -2,10 +2,8 @@ package com.ttao.rotatepiechart;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.tt.rotatepiechart.BasePieChartAdapter;
@@ -15,9 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    private boolean isAdded;
     private BasePieChartAdapter<PieChartBean> adapter;
     private List<PieChartBean> list = new ArrayList<>();
     private int[] colors = new int[]{0xFFFD9033, 0xFFF98AEC, 0xFFFF3564, 0xFFF566D4, 0xFF58F4Fa,
@@ -31,16 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         RotatePieChart pieChart = findViewById(R.id.pie_chart);
         TextView textView = findViewById(R.id.text);
-        findViewById(R.id.btn_change_data).setOnClickListener(this);
-
-        for(int i = 0; i < 15; i++){
-            Random random = new Random();
-            PieChartBean bean = new PieChartBean();
-            bean.setTitle("标题"+ i);
-            bean.setValue(random.nextInt(100) + (i + 1) * random.nextInt(50) + random.nextInt(10));
-            bean.setDescription("描述" + i);
-            list.add(bean);
-        }
 
         adapter = new BasePieChartAdapter<PieChartBean>(list) {
             @Override
@@ -68,34 +55,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setOffsetInterpolator(new AccelerateInterpolator());
         pieChart.setPieChartAdapter(adapter);
 
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_change_data:
-                if (isAdded) {
-                    for (int i = 0; i < 3; i++) {
-                        list.remove(list.size() - 1);
-                    }
-                } else {
-                    for(int i = 0; i < 3; i++){
-                        Random random = new Random();
-                        PieChartBean bean = new PieChartBean();
-                        bean.setTitle("新加的条目标题"+ i);
-                        bean.setValue(random.nextInt(100) +
-                                (i + 1) * random.nextInt(50) + random.nextInt(10));
-                        bean.setDescription("新加的条目描述" + i);
-                        list.add(bean);
-                    }
-                }
-                isAdded = !isAdded;
-                ((Button)v).setText(getResources().getString(isAdded ? R.string.btn_text_deduct
-                        : R.string.btn_text_add));
-                adapter.notifyDatasetChanged();
-                break;
-            default:
-                break;
+        for(int i = 0; i < 15; i++){
+            Random random = new Random();
+            PieChartBean bean = new PieChartBean();
+            bean.setTitle("标题"+ i);
+            bean.setValue(random.nextInt(100) + (i + 1) * random.nextInt(50) + random.nextInt(10));
+            bean.setDescription("描述" + i);
+            list.add(bean);
         }
+        adapter.notifyDatasetChanged();
     }
 }
