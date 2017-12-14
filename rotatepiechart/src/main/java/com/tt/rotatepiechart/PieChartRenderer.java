@@ -243,6 +243,8 @@ public class PieChartRenderer<T> {
             mRectF = new RectF(centerPoint[0] - radius, centerPoint[1] - radius,
                     centerPoint[0] + radius, centerPoint[1] + radius);
             mCanvas = mSurfaceHolder.lockCanvas();
+            if (mCanvas == null)
+                return;
             clearPieChart();
             //3.画饼状图
             switch (msg.what) {
@@ -345,6 +347,8 @@ public class PieChartRenderer<T> {
             if (mCanvas != null) {
                 mSurfaceHolder.unlockCanvasAndPost(mCanvas);
             }
+            if (msg.what == TAG_ENTRANCE_DRAW)
+                return;
             //当前指示位置回调，主线程
             final int position = getCurrentPosition();
             if (mCurrentPosition != position) {

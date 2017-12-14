@@ -218,7 +218,7 @@ public class RotatePieChart extends SurfaceView implements SurfaceHolder.Callbac
 
     @Override
     public void notifyDataSetChanged() {
-        if (mChartRenderer != null) {
+        if (mChartRenderer != null && surfaceCreated) {
             entranceRenderer();
         }
     }
