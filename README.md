@@ -7,7 +7,7 @@
 # JCenter 引入方法
 build.gradle添加:
 
-`compile 'com.tt.rotatepiechart:rotatepiechart:1.0.0'`
+`compile 'com.tt.rotatepiechart:rotatepiechart:1.0.1'`
 
 
 # 使用介绍
